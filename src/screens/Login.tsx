@@ -33,28 +33,32 @@ export default function Login() {
       const token = res.data?.result?.token;
 
       if (!token) {
-        Alert.alert('Login failed');
+        Alert.alert('Login failed Check your credentials.');
         return;
       }
 
       await saveToken(token);
       navigation.replace('Home' as never);
     } catch (err) {
-      ToastAndroid.show(
-        'Login failed. Check your credentials.',
-        2000,
-      );
+      ToastAndroid.show('Login failed. Check your credentials.', 2000);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={{ padding: 20, flex: 1, backgroundColor: '#fff' }}>
+    <View
+      style={{
+        paddingHorizontal: 30,
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingVertical: '25%',
+      }}
+    >
       <TextInput
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 13,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -80,7 +84,7 @@ export default function Login() {
         }}
       >
         <TextInput
-          style={{ flex: 1, paddingVertical: 8, color: '#000' }}
+          style={{ flex: 1, paddingVertical: 13, color: '#000' }}
           placeholder="Enter password"
           placeholderTextColor="#555"
           secureTextEntry={!showPass}
@@ -103,17 +107,17 @@ export default function Login() {
         onPress={submit}
         style={{
           marginTop: 20,
-          padding: 10,
+          padding: 15,
           backgroundColor: '#60cdffff',
           borderRadius: 5,
         }}
       >
         {loading ? (
-          <Text style={{ color: 'white', textAlign: 'center' }}>
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>
             Loading...
           </Text>
         ) : (
-          <Text style={{ color: 'white', textAlign: 'center' }}>Login</Text>
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>Login</Text>
         )}
       </TouchableOpacity>
 

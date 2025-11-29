@@ -12,12 +12,12 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 export default function Verify() {
   const navigation = useNavigation();
   const route = useRoute();
-  const [token, settoken] = useState(route.params?.token || '');
+  const [random, setRandom] = useState(route.params?.random || '');
 
   const submit = async () => {
     try {
-      const res = await api.post('/verifyUser', {
-        params: { token },
+      await api.post('/verifyUser', {
+        params: { random },
       });
 
       ToastAndroid.show('Verified! You can login now', ToastAndroid.SHORT);
@@ -38,11 +38,12 @@ export default function Verify() {
           marginTop: 10,
           borderColor: '#aaa',
         }}
-        placeholderTextColor="#000"
         placeholder="Verification Code"
-        value={token}
-        onChangeText={settoken}
+        placeholderTextColor="#000"
+        value={random}
+        onChangeText={setRandom}
       />
+
       <TouchableOpacity
         onPress={submit}
         style={{ marginTop: 20, padding: 10, backgroundColor: 'blue' }}

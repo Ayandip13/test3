@@ -28,32 +28,39 @@ export default function SignUp() {
   const change = (k: string, v: string) => setForm({ ...form, [k]: v });
 
   const submit = async () => {
-    if (form.password !== form.confirm_password) {
-      ToastAndroid.show('Password mismatch', 2000);
-      return;
-    }
     if (
-      form.name &&
-      form.email &&
-      form.phone &&
-      form.password &&
-      form.confirm_password === ''
+      !form.name ||
+      !form.email ||
+      !form.phone ||
+      !form.password ||
+      !form.confirm_password
     ) {
       ToastAndroid.show('Please fill all the fields', ToastAndroid.SHORT);
       return;
     }
+
+    if (form.password !== form.confirm_password) {
+      ToastAndroid.show('Password mismatch', 2000);
+      return;
+    }
+
     try {
       setLoading(true);
-      const res = await api.post('/signUp', form);
-      const token = res.data?.result?.status?.code;
 
-      if (!token) {
+      const res = await api.post('/signUp', {
+        params: form,
+      });
+
+      const random = res.data?.result?.status?.code;
+
+      if (!random) {
+        console.log('SIGNUP RESPONSE:', res.data);
         ToastAndroid.show('Verification code missing', 2000);
         return;
       }
 
       ToastAndroid.show('Success! Now verify your email', 2000);
-      navigation.navigate('Verify', { token });
+      navigation.navigate('Verify', { random });
     } catch (err) {
       ToastAndroid.show('Signup failed. Try again later.', 2000);
     } finally {
@@ -62,11 +69,18 @@ export default function SignUp() {
   };
 
   return (
-    <View style={{ padding: 20, flex: 1, backgroundColor: '#fff' }}>
+    <View
+      style={{
+        paddingVertical: '20%',
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingHorizontal: 30,
+      }}
+    >
       <TextInput
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 13,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -83,7 +97,7 @@ export default function SignUp() {
         keyboardType="email-address"
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 13,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -98,7 +112,7 @@ export default function SignUp() {
       <TextInput
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 13,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -124,7 +138,7 @@ export default function SignUp() {
         }}
       >
         <TextInput
-          style={{ flex: 1, paddingVertical: 8, color: '#000' }}
+          style={{ flex: 1, paddingVertical: 13, color: '#000' }}
           placeholder="Enter password"
           placeholderTextColor="#555"
           secureTextEntry={!showPass}
@@ -155,7 +169,7 @@ export default function SignUp() {
         }}
       >
         <TextInput
-          style={{ flex: 1, paddingVertical: 8, color: '#000' }}
+          style={{ flex: 1, paddingVertical: 13, color: '#000' }}
           placeholder="Confirm Password"
           placeholderTextColor="#555"
           secureTextEntry={!showConfirm}
@@ -178,17 +192,19 @@ export default function SignUp() {
         onPress={submit}
         style={{
           marginTop: 20,
-          padding: 10,
+          padding: 15,
           backgroundColor: '#60cdffff',
           borderRadius: 5,
         }}
       >
         {loading ? (
-          <Text style={{ color: 'white', textAlign: 'center' }}>
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>
             Loading...
           </Text>
         ) : (
-          <Text style={{ color: 'white', textAlign: 'center' }}>Sign Up</Text>
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>
+            Sign Up
+          </Text>
         )}
       </TouchableOpacity>
 

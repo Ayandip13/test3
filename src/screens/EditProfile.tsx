@@ -56,16 +56,16 @@ export default function EditProfile() {
 
   const save = async () => {
     if (
-      form.name &&
-      form.email &&
-      form.phone &&
-      form.address &&
-      form.city &&
-      form.state &&
-      form.country &&
-      form.postcode === ''
+      !form.name ||
+      !form.email ||
+      !form.phone ||
+      !form.address ||
+      !form.city ||
+      !form.state ||
+      !form.country ||
+      !form.postcode
     ) {
-      ToastAndroid.show('Please fill all the fields', ToastAndroid.SHORT);
+      ToastAndroid.show('Please fill all fields', ToastAndroid.SHORT);
       return;
     }
     try {
@@ -100,7 +100,7 @@ export default function EditProfile() {
         value={form.name}
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 10,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -113,7 +113,7 @@ export default function EditProfile() {
       <TextInput
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 10,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -128,7 +128,7 @@ export default function EditProfile() {
       <TextInput
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 10,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -143,7 +143,7 @@ export default function EditProfile() {
       <TextInput
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 10,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -158,7 +158,7 @@ export default function EditProfile() {
       <TextInput
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 10,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -173,7 +173,7 @@ export default function EditProfile() {
       <TextInput
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 10,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -189,7 +189,7 @@ export default function EditProfile() {
         placeholderTextColor="#555"
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 10,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -204,7 +204,7 @@ export default function EditProfile() {
         placeholderTextColor="#555"
         style={{
           borderWidth: 1,
-          padding: 8,
+          padding: 10,
           borderRadius: 5,
           marginBottom: 10,
           marginTop: 10,
@@ -226,7 +226,7 @@ export default function EditProfile() {
         }}
       >
         {loading ? (
-          <Text>Saving...</Text>
+          <Text style={{ color: 'white', textAlign: 'center' }}>Saving...</Text>
         ) : (
           <Text style={{ color: 'white', textAlign: 'center' }}>
             Save Profile
