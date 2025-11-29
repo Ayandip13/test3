@@ -40,7 +40,7 @@ export default function SignUp() {
     }
 
     if (form.password !== form.confirm_password) {
-      ToastAndroid.show('Password mismatch', 2000);
+      ToastAndroid.show('Password mismatch', ToastAndroid.SHORT);
       return;
     }
 
@@ -48,21 +48,31 @@ export default function SignUp() {
       setLoading(true);
 
       const res = await api.post('/signUp', {
-        params: form,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+        confirm_password: form.confirm_password,
       });
+
+      console.log('SIGNUP RESPONSE => ', res.data);
 
       const random = res.data?.result?.status?.code;
 
       if (!random) {
-        console.log('SIGNUP RESPONSE:', res.data);
-        ToastAndroid.show('Verification code missing', 2000);
+        ToastAndroid.show('Verification code missing', ToastAndroid.SHORT);
         return;
       }
 
-      ToastAndroid.show('Success! Now verify your email', 2000);
+      ToastAndroid.show('Success! Now verify your email', ToastAndroid.SHORT);
       navigation.navigate('Verify', { random });
-    } catch (err) {
-      ToastAndroid.show('Signup failed. Try again later.', 2000);
+    } catch (err: any) {
+      console.log('SIGNUP ERROR => ', err.response?.data);
+
+      const msg =
+        err.response?.data?.error?.meaning || 'Signup failed. Please try again';
+
+      ToastAndroid.show(msg, ToastAndroid.SHORT);
     } finally {
       setLoading(false);
     }

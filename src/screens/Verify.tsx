@@ -46,9 +46,24 @@ export default function Verify() {
 
       <TouchableOpacity
         onPress={submit}
-        style={{ marginTop: 20, padding: 10, backgroundColor: 'blue' }}
+        style={{
+          marginTop: 20,
+          padding: 10,
+          backgroundColor: '#60cdffff',
+          borderRadius: 5,
+          justifyContent: 'center',
+        }}
       >
-        <Text style={{ color: 'white', textAlign: 'center' }}>Verify</Text>
+        <Text
+          style={{
+            color: 'white',
+            textAlign: 'center',
+            fontSize: 16,
+            fontWeight: 'bold',
+          }}
+        >
+          Verify
+        </Text>
       </TouchableOpacity>
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,17 @@ import {
   ScrollView,
 } from 'react-native';
 import { getToken, logout } from '../utils/storage';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../api/api';
 
 export default function Home() {
   const navigation = useNavigation();
+
+  useFocusEffect(
+    useCallback(() => {
+      loadUser();
+    }, []),
+  );
 
   const [form, setForm] = useState({
     name: '',
@@ -95,7 +101,7 @@ export default function Home() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button,]}
+          style={[styles.button]}
           onPress={async () => {
             await logout();
             navigation.replace('Login' as never);

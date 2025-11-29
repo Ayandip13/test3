@@ -9,8 +9,10 @@ import {
 } from 'react-native';
 import { api } from '../api/api';
 import { getToken } from '../utils/storage';
+import { useNavigation } from '@react-navigation/native';
 
 export default function EditProfile() {
+  const navigation = useNavigation();
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -86,6 +88,7 @@ export default function EditProfile() {
 
       const json = await res.json();
       ToastAndroid.show('Profile updated', ToastAndroid.SHORT);
+      navigation.goBack();
     } catch (error) {
       ToastAndroid.show('Failed to update profile', ToastAndroid.SHORT);
     } finally {
@@ -136,6 +139,8 @@ export default function EditProfile() {
           color: '#000',
         }}
         placeholder="Enter phone number"
+        keyboardType="phone-pad"
+        maxLength={10}
         value={form.phone}
         onChangeText={t => change('phone', t)}
         placeholderTextColor="#555"
@@ -213,6 +218,8 @@ export default function EditProfile() {
         }}
         placeholder="Enter postal code"
         value={form.postcode}
+        maxLength={6}
+        keyboardType="numeric"
         onChangeText={t => change('postcode', t)}
       />
 
