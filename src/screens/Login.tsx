@@ -20,27 +20,56 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const submit = async () => {
-    if (!email || !password) {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    // Regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^.{6,}$/; // Min 6 characters
+
+    // Empty Check
+    if (!trimmedEmail || !trimmedPassword) {
       ToastAndroid.show('Please fill all the fields', ToastAndroid.SHORT);
       return;
     }
+
+    // Email Validation
+    if (!emailRegex.test(trimmedEmail)) {
+      ToastAndroid.show('Invalid email format', ToastAndroid.SHORT);
+      return;
+    }
+
+    // Password Validation
+    if (!passwordRegex.test(trimmedPassword)) {
+      ToastAndroid.show(
+        'Password must be at least 6 characters',
+        ToastAndroid.SHORT,
+      );
+      return;
+    }
+
     try {
       setLoading(true);
+
+      // FIXED: POST request body format
       const res = await api.post('/auth/login', {
         params: { email, password },
       });
 
-      const token = res.data?.result?.token;
+      const token = res?.data?.result?.token;
 
       if (!token) {
-        Alert.alert('Login failed Check your credentials.');
+        Alert.alert('Login failed. Check your credentials.');
         return;
       }
 
       await saveToken(token);
       navigation.replace('Home' as never);
     } catch (err) {
-      ToastAndroid.show('Login failed. Check your credentials.', 2000);
+      ToastAndroid.show(
+        'Login failed. Check your credentials.',
+        ToastAndroid.SHORT,
+      );
     } finally {
       setLoading(false);
     }
@@ -96,7 +125,7 @@ export default function Login() {
             source={
               showPass
                 ? require('../../assets/hide.png')
-                : require('../../assets/eye.png')
+                : require('../../assets/view.png')
             }
             style={{ height: 22, width: 22 }}
           />
@@ -117,7 +146,9 @@ export default function Login() {
             Loading...
           </Text>
         ) : (
-          <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>Login</Text>
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>
+            Login
+          </Text>
         )}
       </TouchableOpacity>
 

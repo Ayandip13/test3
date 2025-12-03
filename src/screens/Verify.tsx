@@ -15,6 +15,10 @@ export default function Verify() {
   const [random, setRandom] = useState(route.params?.random || '');
 
   const submit = async () => {
+    if (!random) {
+      ToastAndroid.show('Please enter a code', ToastAndroid.SHORT);
+      return;
+    }
     try {
       await api.post('/verifyUser', {
         params: { random },

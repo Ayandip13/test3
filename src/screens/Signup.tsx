@@ -28,19 +28,42 @@ export default function SignUp() {
   const change = (k: string, v: string) => setForm({ ...form, [k]: v });
 
   const submit = async () => {
-    if (
-      !form.name ||
-      !form.email ||
-      !form.phone ||
-      !form.password ||
-      !form.confirm_password
-    ) {
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const phone = form.phone.trim();
+    const password = form.password.trim();
+    const confirm_password = form.confirm_password.trim();
+
+    // REGEX
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10}$/;
+    const passwordRegex = /^.{6,}$/;
+
+    if (!name || !email || !phone || !password || !confirm_password) {
       ToastAndroid.show('Please fill all the fields', ToastAndroid.SHORT);
       return;
     }
 
-    if (form.password !== form.confirm_password) {
-      ToastAndroid.show('Password mismatch', ToastAndroid.SHORT);
+    if (!emailRegex.test(email)) {
+      ToastAndroid.show('Invalid email format', ToastAndroid.SHORT);
+      return;
+    }
+
+    if (!phoneRegex.test(phone)) {
+      ToastAndroid.show('Invalid phone number', ToastAndroid.SHORT);
+      return;
+    }
+
+    if (!passwordRegex.test(password)) {
+      ToastAndroid.show(
+        'Password must be at least 6 characters',
+        ToastAndroid.SHORT,
+      );
+      return;
+    }
+
+    if (password !== confirm_password) {
+      ToastAndroid.show('Passwords do not match', ToastAndroid.SHORT);
       return;
     }
 
@@ -48,11 +71,11 @@ export default function SignUp() {
       setLoading(true);
 
       const res = await api.post('/signUp', {
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        password: form.password,
-        confirm_password: form.confirm_password,
+        name,
+        email,
+        phone,
+        password,
+        confirm_password,
       });
 
       console.log('SIGNUP RESPONSE => ', res.data);
@@ -65,6 +88,7 @@ export default function SignUp() {
       }
 
       ToastAndroid.show('Success! Now verify your email', ToastAndroid.SHORT);
+
       navigation.navigate('Verify', { random });
     } catch (err: any) {
       console.log('SIGNUP ERROR => ', err.response?.data);
@@ -160,7 +184,7 @@ export default function SignUp() {
             source={
               showPass
                 ? require('../../assets/hide.png')
-                : require('../../assets/eye.png')
+                : require('../../assets/view.png')
             }
             style={{ width: 22, height: 22 }}
           />
@@ -191,7 +215,7 @@ export default function SignUp() {
             source={
               showConfirm
                 ? require('../../assets/hide.png')
-                : require('../../assets/eye.png')
+                : require('../../assets/view.png')
             }
             style={{ width: 22, height: 22 }}
           />
