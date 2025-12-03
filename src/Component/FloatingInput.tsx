@@ -8,6 +8,14 @@ interface FloatingInputProps {
   secureTextEntry?: boolean;
   showToggle?: boolean;
   toggle?: () => void;
+  placeholder?: string;
+  maxLength?: number;
+  keyboardType?:
+    | 'default'
+    | 'email-address'
+    | 'numeric'
+    | 'phone-pad'
+    | 'number-pad';
 }
 
 const FloatingInput = ({
@@ -17,6 +25,9 @@ const FloatingInput = ({
   secureTextEntry,
   showToggle,
   toggle,
+  placeholder,
+  maxLength,
+  keyboardType,
 }: FloatingInputProps) => {
   return (
     <View style={{ marginBottom: 20 }}>
@@ -24,7 +35,7 @@ const FloatingInput = ({
         style={{
           position: 'absolute',
           top: -10,
-          left: 25,
+          left: 20,
           backgroundColor: '#fff',
           paddingHorizontal: 8,
           fontSize: 14,
@@ -43,15 +54,18 @@ const FloatingInput = ({
           borderColor: '#ccc',
           borderRadius: 50,
           paddingHorizontal: 20,
-          paddingVertical: 8,
+          paddingVertical: 3,
         }}
       >
         <TextInput
           value={value}
           onChangeText={onChangeText}
-          placeholder={label}
+          placeholder={placeholder || 'Enter Here'}
+          placeholderTextColor="#999"
           secureTextEntry={secureTextEntry}
           style={{ flex: 1, color: '#000', fontSize: 15 }}
+          maxLength={maxLength}
+          keyboardType={keyboardType}
         />
 
         {showToggle && (

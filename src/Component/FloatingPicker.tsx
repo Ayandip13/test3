@@ -17,14 +17,13 @@ const FloatingPicker = ({
 }: FloatingPickerProps) => {
   return (
     <View style={{ marginBottom: 20 }}>
-      {/* Floating Label */}
       <Text
         style={{
           position: 'absolute',
           top: -10,
-          left: 25,
+          left: 20,
           backgroundColor: '#fff',
-          paddingHorizontal: 8,
+          paddingHorizontal: 4,
           fontSize: 14,
           color: '#555',
           zIndex: 10,
