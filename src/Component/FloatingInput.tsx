@@ -30,12 +30,12 @@ const FloatingInput = ({
   keyboardType,
 }: FloatingInputProps) => {
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View style={{ marginBottom: 25 }}>
       <Text
         style={{
           position: 'absolute',
-          top: -10,
-          left: 20,
+          top: -12,
+          left: 28,
           backgroundColor: '#fff',
           paddingHorizontal: 8,
           fontSize: 14,
@@ -50,24 +50,31 @@ const FloatingInput = ({
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          borderWidth: 1,
-          borderColor: '#ccc',
-          borderRadius: 50,
+          borderWidth: 1.4,
+          borderColor: '#dedede',
+          borderRadius: 40,
           paddingHorizontal: 20,
-          paddingVertical: 3,
+          height: 60,
+          backgroundColor: '#fff',
         }}
       >
         <TextInput
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder || 'Enter Here'}
-          placeholderTextColor="#999"
+          placeholderTextColor="#A0A0A0"
           secureTextEntry={secureTextEntry}
-          style={{ flex: 1, color: '#000', fontSize: 15 }}
+          style={{
+            flex: 1,
+            color: '#000',
+            fontSize: 16,
+            paddingVertical: 0, // Makes TextInput perfect vertically
+          }}
           maxLength={maxLength}
           keyboardType={keyboardType}
         />
 
+        {/* Password Eye Toggle */}
         {showToggle && (
           <TouchableOpacity onPress={toggle}>
             <Image
@@ -76,7 +83,7 @@ const FloatingInput = ({
                   ? require('../../assets/view.png')
                   : require('../../assets/hide.png')
               }
-              style={{ width: 22, height: 22, tintColor: '#777' }}
+              style={{ width: 24, height: 24, tintColor: '#777' }}
             />
           </TouchableOpacity>
         )}

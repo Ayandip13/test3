@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import {
   View,
-  TextInput,
-  Alert,
-  TouchableOpacity,
   Text,
+  TouchableOpacity,
+  TextInput,
   Image,
   ToastAndroid,
+  ScrollView,
+  ImageBackground,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { api } from '../api/api';
 import { saveToken } from '../utils/storage';
-import { useNavigation } from '@react-navigation/native';
+import FloatingInput from '../Component/FloatingInput';
 
 export default function Login() {
   const navigation = useNavigation();
@@ -23,144 +25,178 @@ export default function Login() {
     const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
 
-    // Regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const passwordRegex = /^.{6,}$/; // Min 6 characters
 
-    // Empty Check
     if (!trimmedEmail || !trimmedPassword) {
-      ToastAndroid.show('Please fill all the fields', ToastAndroid.SHORT);
+      ToastAndroid.show('Please fill all fields', ToastAndroid.SHORT);
       return;
     }
-
-    // Email Validation
     if (!emailRegex.test(trimmedEmail)) {
       ToastAndroid.show('Invalid email format', ToastAndroid.SHORT);
       return;
     }
 
-    // Password Validation
-    if (!passwordRegex.test(trimmedPassword)) {
-      ToastAndroid.show(
-        'Password must be at least 6 characters',
-        ToastAndroid.SHORT,
-      );
-      return;
-    }
-
     try {
       setLoading(true);
-
-      // FIXED: POST request body format
       const res = await api.post('/auth/login', {
-        params: { email, password },
+        email,
+        password,
       });
 
       const token = res?.data?.result?.token;
-
       if (!token) {
-        Alert.alert('Login failed. Check your credentials.');
+        ToastAndroid.show('Invalid credentials', ToastAndroid.SHORT);
         return;
       }
 
       await saveToken(token);
       navigation.replace('Home' as never);
-    } catch (err) {
-      ToastAndroid.show(
-        'Login failed. Check your credentials.',
-        ToastAndroid.SHORT,
-      );
+    } catch (e) {
+      ToastAndroid.show('Login failed', ToastAndroid.SHORT);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View
+    <ImageBackground
+      source={require('../../assets/appbg.png')}
+      resizeMode="cover"
       style={{
-        paddingHorizontal: 30,
         flex: 1,
-        backgroundColor: '#fff',
-        paddingVertical: '25%',
       }}
     >
-      <TextInput
-        style={{
-          borderWidth: 1,
-          padding: 13,
-          borderRadius: 5,
-          marginBottom: 10,
-          marginTop: 10,
-          color: '#000',
-          borderColor: '#aaa',
-        }}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        placeholderTextColor="#555"
-        placeholder="Enter email"
-        onChangeText={setEmail}
-      />
-
-      <View
-        style={{
-          borderWidth: 1,
-          borderColor: '#aaa',
-          borderRadius: 5,
-          paddingHorizontal: 8,
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginTop: 10,
-        }}
-      >
-        <TextInput
-          style={{ flex: 1, paddingVertical: 13, color: '#000' }}
-          placeholder="Enter password"
-          placeholderTextColor="#555"
-          secureTextEntry={!showPass}
-          onChangeText={setPassword}
-        />
-
-        <TouchableOpacity onPress={() => setShowPass(!showPass)}>
-          <Image
-            source={
-              showPass
-                ? require('../../assets/hide.png')
-                : require('../../assets/view.png')
-            }
-            style={{ height: 22, width: 22 }}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        onPress={submit}
-        style={{
-          marginTop: 20,
-          padding: 15,
-          backgroundColor: '#60cdffff',
-          borderRadius: 5,
-        }}
-      >
-        {loading ? (
-          <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>
-            Loading...
-          </Text>
-        ) : (
-          <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>
-            Login
-          </Text>
-        )}
-      </TouchableOpacity>
-
-      <Text style={{ marginTop: 20, textAlign: 'center' }}>
-        Don't have an account?{' '}
-        <Text
-          style={{ color: 'blue' }}
-          onPress={() => navigation.navigate('SignUp' as never)}
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        <View
+          style={{
+            paddingHorizontal: 25,
+            paddingTop: 40,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
         >
-          Sign up
-        </Text>
-      </Text>
-    </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image
+              source={require('../../assets/back.png')}
+              style={{ width: 22, height: 22, tintColor: '#fff' }}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <Text
+              style={{
+                color: '#fff',
+                fontSize: 15,
+                fontWeight: '500',
+              }}
+            >
+              Forgot Password?
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            marginTop: 40,
+            backgroundColor: '#fff',
+            borderTopLeftRadius: 40,
+            borderTopRightRadius: 40,
+            paddingHorizontal: 25,
+            paddingTop: 35,
+            // paddingBottom: 40,
+          }}
+        >
+          <Text style={{ fontSize: 26, fontWeight: '500', color: '#111' }}>
+            Login to Your Account
+          </Text>
+
+          <Text
+            style={{
+              marginTop: 5,
+              fontSize: 15,
+              color: '#555',
+              marginBottom: 35,
+            }}
+          >
+            Please fill below fields to login
+          </Text>
+
+          <FloatingInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Enter Here"
+            keyboardType="email-address"
+          />
+
+          <FloatingInput
+            label="Current Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPass}
+            showToggle
+            toggle={() => setShowPass(!showPass)}
+            placeholder="Enter Here"
+            maxLength={20}
+            keyboardType="default"
+          />
+
+          <TouchableOpacity
+            onPress={submit}
+            style={{
+              backgroundColor: '#e63939',
+              top: '45%',
+              paddingVertical: 12,
+              borderRadius: 40,
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              gap: 10,
+              width: '50%',
+              alignSelf: 'center',
+              opacity: loading ? 0.7 : 1,
+            }}
+          >
+            <Text
+              style={{
+                color: '#fff',
+                fontSize: 15,
+                fontWeight: '600',
+                letterSpacing: 1,
+              }}
+            >
+              LOGIN
+            </Text>
+
+            <Image
+              source={require('../../assets/arrowright.png')}
+              style={{ width: 20, height: 20, tintColor: '#fff' }}
+            />
+          </TouchableOpacity>
+
+          <View style={{ top: '70%', alignItems: 'center' }}>
+            <Text style={{ color: '#ffffff', marginBottom: 8, fontSize: 13 }}>
+              OR
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('SignUp' as never)}
+            >
+              <Text
+                style={{
+                  color: '#ffffff',
+                  fontSize: 16,
+                  fontWeight: '600',
+                  letterSpacing: 1,
+                }}
+              >
+                CREATE AN ACCOUNT
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </ImageBackground>
   );
 }

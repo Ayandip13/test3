@@ -382,7 +382,6 @@ export default function EditProfile() {
             placeholder="Enter Here"
           />
 
-          {/* PHONE */}
           <FloatingInput
             maxLength={10}
             keyboardType="phone-pad"
@@ -421,14 +420,12 @@ export default function EditProfile() {
             ))}
           </FloatingPicker>
 
-          {/* CITY */}
           <FloatingInput
             label="City"
             value={form.city}
             onChangeText={t => change('city', t)}
           />
 
-          {/* POSTAL CODE */}
           <FloatingInput
             label="Postal Code"
             value={form.postcode}
