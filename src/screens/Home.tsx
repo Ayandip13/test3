@@ -128,7 +128,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     padding: 20,
     borderRadius: 10,
-    elevation: 2,
+    elevation: 4,
+    shadowColor: '#e63939',
   },
 
   header: {
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: '#60cdffff',
+    backgroundColor: '#e63939',
     paddingVertical: 14,
     width: '45%',
     borderRadius: 6,
@@ -174,5 +175,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
     textAlign: 'center',
+    color: '#fff',
   },
 });

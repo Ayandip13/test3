@@ -378,6 +378,7 @@ export default function EditProfile() {
           <FloatingInput
             label="Email"
             value={form.email}
+            autoCapitalize='none'
             onChangeText={t => change('email', t)}
             placeholder="Enter Here"
           />

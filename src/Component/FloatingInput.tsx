@@ -16,6 +16,10 @@ interface FloatingInputProps {
     | 'numeric'
     | 'phone-pad'
     | 'number-pad';
+  width?: number | string;
+  height?: number;
+  merginBottom?: number;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
 }
 
 const FloatingInput = ({
@@ -28,9 +32,13 @@ const FloatingInput = ({
   placeholder,
   maxLength,
   keyboardType,
+  merginBottom,
+  width,
+  height,
+  autoCapitalize,
 }: FloatingInputProps) => {
   return (
-    <View style={{ marginBottom: 25 }}>
+    <View style={{ marginBottom: merginBottom || 25, width: width || '100%' }}>
       <Text
         style={{
           position: 'absolute',
@@ -54,7 +62,7 @@ const FloatingInput = ({
           borderColor: '#dedede',
           borderRadius: 40,
           paddingHorizontal: 20,
-          height: 60,
+          height: height || 60,
           backgroundColor: '#fff',
         }}
       >
@@ -68,13 +76,13 @@ const FloatingInput = ({
             flex: 1,
             color: '#000',
             fontSize: 16,
-            paddingVertical: 0, // Makes TextInput perfect vertically
+            paddingVertical: 0,
           }}
           maxLength={maxLength}
           keyboardType={keyboardType}
+          autoCapitalize={autoCapitalize}
         />
 
-        {/* Password Eye Toggle */}
         {showToggle && (
           <TouchableOpacity onPress={toggle}>
             <Image

@@ -53,7 +53,7 @@ export default function Verify() {
         style={{
           marginTop: 20,
           padding: 10,
-          backgroundColor: '#60cdffff',
+          backgroundColor: '#ff2323ff',
           borderRadius: 5,
           justifyContent: 'center',
         }}
