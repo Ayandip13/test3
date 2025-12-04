@@ -9,6 +9,7 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { api } from '../api/api';
@@ -168,21 +169,27 @@ export default function Login() {
                 top: '25%',
               }}
             >
-              <Text
-                style={{
-                  color: '#fff',
-                  fontSize: 17,
-                  fontWeight: '600',
-                  letterSpacing: 1,
-                }}
-              >
-                LOGIN
-              </Text>
+              {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <>
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontSize: 17,
+                      fontWeight: '600',
+                      letterSpacing: 1,
+                    }}
+                  >
+                    LOGIN
+                  </Text>
 
-              <Image
-                source={require('../../assets/arrowright.png')}
-                style={{ width: 20, height: 20, tintColor: '#fff' }}
-              />
+                  <Image
+                    source={require('../../assets/arrowright.png')}
+                    style={{ width: 20, height: 20, tintColor: '#fff' }}
+                  />
+                </>
+              )}
             </TouchableOpacity>
 
             <View style={{ marginTop: 35, alignItems: 'center', top: '25%' }}>

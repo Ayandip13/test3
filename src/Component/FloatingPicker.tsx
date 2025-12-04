@@ -42,9 +42,11 @@ const FloatingPicker = ({
         }}
       >
         <Picker
-          selectedValue={selectedValue}
-          onValueChange={onValueChange}
-          style={{ height: 50 }}
+          selectedValue={selectedValue || ''}
+          onValueChange={(itemValue, index) =>
+            onValueChange(String(itemValue), index)
+          }
+          style={{ height: 50, width: '100%' }}
         >
           {children}
         </Picker>

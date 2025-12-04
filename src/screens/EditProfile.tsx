@@ -56,32 +56,52 @@ export default function EditProfile() {
   }, []);
 
   const loadUser = async () => {
-    const token = await getToken();
+    try {
+      const token = await getToken();
+      if (!token) {
+        // handle missing token gracefully
+        console.warn('No token found');
+        return;
+      }
 
-    const res = await api.post(
-      '/user-details',
-      {},
-      { headers: { Authorization: `bearer ${token}` } },
-    );
+      const res = await api.post(
+        '/user-details',
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
 
-    const data = res.data?.result?.userData;
+      const data = res.data?.result?.userData;
+      if (!data) return;
 
-    if (data) {
+      // normalize country to our codes (IN/US)
+      const countryCode = (data.country || '')
+        .toString()
+        .toLowerCase()
+        .includes('india')
+        ? 'IN'
+        : (data.country || '').toString().toLowerCase().includes('united')
+        ? 'US'
+        : data.country;
+
       setForm(prev => ({
         ...prev,
-        name: data.name,
-        email: data.email,
-        phone: String(data.phone),
-        country: data.country,
-        state: data.state,
-        city: data.city,
-        postcode: String(data.postcode),
-        fullAddress: data.address,
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.phone ? String(data.phone) : '',
+        country: countryCode || '',
+        state: data.state || '',
+        city: data.city || '',
+        postcode: data.postcode ? String(data.postcode) : '',
+        fullAddress: data.address || '',
       }));
 
-      if (statesData[data.country]) {
-        setAvailableStates(statesData[data.country]);
+      if (statesData[countryCode]) {
+        setAvailableStates(statesData[countryCode]);
+      } else {
+        setAvailableStates([]);
       }
+    } catch (err) {
+      console.warn('Failed to load user', err);
     }
   };
 
@@ -89,48 +109,87 @@ export default function EditProfile() {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
 
+  const showToastOrAlert = (msg: string, long = false) => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(msg, long ? ToastAndroid.LONG : ToastAndroid.SHORT);
+    } else {
+      // iOS fallback
+      Alert.alert('', msg);
+    }
+  };
+
   const save = async () => {
-    if (!form.name.trim()) {
-      ToastAndroid.show('Please enter your name', ToastAndroid.SHORT);
+    // basic trims
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const phone = form.phone.trim();
+    const city = form.city.trim();
+    const postcode = form.postcode.trim();
+    const fullAddress = form.fullAddress.trim();
+
+    if (!name) {
+      showToastOrAlert('Please enter your name');
       return;
     }
-    if (!form.email.trim()) {
-      ToastAndroid.show('Please enter your email', ToastAndroid.SHORT);
+    if (!email) {
+      showToastOrAlert('Please enter your email');
       return;
     }
-    if (!emailRegex.test(form.email.trim())) {
-      ToastAndroid.show('Invalid email format', ToastAndroid.SHORT);
-      return;
-    }
-    if (!form.phone.trim()) {
-      ToastAndroid.show('Please enter your phone number', ToastAndroid.SHORT);
-      return;
-    }
-    if (!/^[6-9]\d{9}$/.test(form.phone.trim())) {
-      ToastAndroid.show('Invalid phone number', ToastAndroid.SHORT);
-      return;
-    }
-    // if (!form.country) {
-    //   ToastAndroid.show('Please select your country', ToastAndroid.SHORT);
-    //   return;
-    // }
-    if (!form.state) {
-      ToastAndroid.show('Please select your state', ToastAndroid.SHORT);
-      return;
-    }
-    if (!form.city.trim()) {
-      ToastAndroid.show('Please enter your city', ToastAndroid.SHORT);
-      return;
-    }
-    if (!/^\d{6}$/.test(form.postcode.trim())) {
-      ToastAndroid.show('Invalid postal code', ToastAndroid.SHORT);
-      return;
-    }
-    if (!form.fullAddress.trim()) {
-      ToastAndroid.show('Please enter your full address', ToastAndroid.SHORT);
+    if (!emailRegex.test(email)) {
+      showToastOrAlert('Invalid email format');
       return;
     }
 
+    // country-specific checks
+    const country = form.country || 'IN'; // default IN if not picked
+    if (!form.country) {
+      showToastOrAlert('Please select your country');
+      return;
+    }
+
+    if (!form.state) {
+      showToastOrAlert('Please select your state');
+      return;
+    }
+
+    if (!city) {
+      showToastOrAlert('Please enter your city');
+      return;
+    }
+
+    if (country === 'IN') {
+      if (!/^[6-9]\d{9}$/.test(phone)) {
+        showToastOrAlert('Invalid phone number for India');
+        return;
+      }
+      if (!/^\d{6}$/.test(postcode)) {
+        showToastOrAlert('Invalid postal code for India');
+        return;
+      }
+    } else if (country === 'US') {
+      if (!/^\d{5}(-\d{4})?$/.test(postcode)) {
+        showToastOrAlert('Invalid ZIP code for US (e.g. 12345 or 12345-6789)');
+        return;
+      }
+      // very loose phone check for US (10 digits)
+      if (!/^\d{10}$/.test(phone)) {
+        showToastOrAlert('Invalid phone number for US (10 digits)');
+        return;
+      }
+    } else {
+      // fallback generic checks
+      if (!phone) {
+        showToastOrAlert('Please enter your phone number');
+        return;
+      }
+    }
+
+    if (!fullAddress) {
+      showToastOrAlert('Please enter your full address');
+      return;
+    }
+
+    // password update logic
     const updatingPassword =
       form.oldPassword.trim().length > 0 ||
       form.newPassword.trim().length > 0 ||
@@ -138,67 +197,80 @@ export default function EditProfile() {
 
     if (updatingPassword) {
       if (!form.oldPassword.trim()) {
-        ToastAndroid.show('Enter your current password', ToastAndroid.SHORT);
+        showToastOrAlert('Enter your current password');
         return;
       }
-
       if (!form.newPassword.trim()) {
-        ToastAndroid.show('Enter new password', ToastAndroid.SHORT);
+        showToastOrAlert('Enter new password');
         return;
       }
-
       if (!passwordRegex.test(form.newPassword.trim())) {
-        ToastAndroid.show(
+        showToastOrAlert(
           'Password must be 8+ chars, include uppercase, lowercase, number & special char',
-          ToastAndroid.LONG,
+          true,
         );
         return;
       }
-
       if (form.newPassword.trim() !== form.confirmPassword.trim()) {
-        ToastAndroid.show('Passwords do not match', ToastAndroid.SHORT);
+        showToastOrAlert('Passwords do not match');
         return;
       }
-
       if (form.oldPassword.trim() === form.newPassword.trim()) {
-        ToastAndroid.show(
-          'New password cannot be same as old password',
-          ToastAndroid.SHORT,
-        );
+        showToastOrAlert('New password cannot be same as old password');
         return;
       }
     }
 
     try {
       setLoading(true);
-
       const token = await getToken();
+      if (!token) {
+        showToastOrAlert('Not authenticated');
+        return;
+      }
+
       const fd = new FormData();
 
-      Object.keys(form).forEach(k => {
-        if (form[k] !== undefined && form[k] !== null) {
-          fd.append(k, String(form[k]));
-        }
-      });
+      fd.append('name', name);
+      fd.append('email', email);
+      fd.append('phone', phone);
+      fd.append('country', country);
+      fd.append('state', form.state);
+      fd.append('city', city);
+      fd.append('postcode', postcode);
+
+      const fullAddress = form.fullAddress.trim();
+      fd.append('address', fullAddress);
+
+      if (updatingPassword) {
+        fd.append('oldPassword', form.oldPassword.trim());
+        fd.append('newPassword', form.newPassword.trim());
+      }
 
       const res = await fetch(
         'https://infowarescripts.com/dev/e-commerce/api/edit-profile',
         {
           method: 'POST',
-          headers: { Authorization: `bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` },
           body: fd,
         },
       );
 
       if (!res.ok) {
-        ToastAndroid.show('Failed to update profile', ToastAndroid.SHORT);
+        let errMsg = 'Failed to update profile';
+        try {
+          const errJson = await res.json();
+          if (errJson?.message) errMsg = errJson.message;
+        } catch (_e) {}
+        showToastOrAlert(errMsg);
         return;
       }
 
-      ToastAndroid.show('Profile updated', ToastAndroid.SHORT);
+      showToastOrAlert('Profile updated');
       navigation.goBack();
     } catch (err) {
-      ToastAndroid.show('Failed to update profile', ToastAndroid.SHORT);
+      console.warn(err);
+      showToastOrAlert('Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -378,7 +450,7 @@ export default function EditProfile() {
           <FloatingInput
             label="Email"
             value={form.email}
-            autoCapitalize='none'
+            autoCapitalize="none"
             onChangeText={t => change('email', t)}
             placeholder="Enter Here"
           />
@@ -400,7 +472,7 @@ export default function EditProfile() {
             label="Country / Region"
             selectedValue={form.country}
             onValueChange={value => {
-              change('country', value);
+              change('country', String(value));
               change('state', '');
               setAvailableStates(statesData[value] || []);
             }}
@@ -413,7 +485,7 @@ export default function EditProfile() {
           <FloatingPicker
             label="State"
             selectedValue={form.state}
-            onValueChange={value => change('state', value)}
+            onValueChange={value => change('state', String(value))}
           >
             <Picker.Item label="Select State" value="" />
             {availableStates.map(st => (

@@ -75,7 +75,7 @@ export default function Home() {
             <Text style={styles.label}>Phone:</Text> {form.phone}
           </Text>
           <Text style={styles.item}>
-            <Text style={styles.label}>Address:</Text> {form.address}
+            <Text style={styles.label}>Full Address:</Text> {form.address}
           </Text>
           <Text style={styles.item}>
             <Text style={styles.label}>City:</Text> {form.city}
@@ -169,6 +169,8 @@ const styles = StyleSheet.create({
     width: '45%',
     borderRadius: 6,
     marginBottom: 10,
+    elevation: 5,
+    shadowColor: '#e63939',
   },
 
   buttonText: {
